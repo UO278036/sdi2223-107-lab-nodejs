@@ -5,29 +5,51 @@ let cookieParser = require('cookie-parser');
 let logger = require('morgan');
 
 let app = express();
+
+let expressSession = require('express-session');
+app.use(expressSession({
+  secret: 'abcdefg',
+  resave: true,
+  saveUninitialized: true
+}));
+
+let crypto = require('crypto');
 let fileUpload = require('express-fileupload');
 app.use(fileUpload({
   limits: { fileSize: 50 * 1024 * 1024 },
   createParentPath: true
 }));
 app.set('uploadPath', __dirname);
+app.set('clave','abcdfg');
+app.set('crypto', crypto);
 
 let bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }))
 
 let indexRouter = require('./routes/index');
-let usersRouter = require('./routes/users');
 require("./routes/authors.js")(app);
 
 const { MongoClient } = require("mongodb");
 const url =
-    'mongodb+srv://admin:<zzgmMaxxDZhJsaPo>@eii-sdi-cluster.rbxsxlu.mongodb.net/?retryWrites=true&w=majority';
+    'mongodb+srv://admin:sdiAdminP5wd@tiendamusica.m9ujw.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
 app.set('connectionStrings', url);
+
+const userSessionRouter = require('./routes/userSessionRouter');
+const userAudiosRouter = require('./routes/userAudiosRouter');
+
+app.use("/songs/add",userSessionRouter);
+app.use("/publications",userSessionRouter);
+app.use("/audios/",userAudiosRouter);
+app.use("/shop/",userSessionRouter);
+
 let songsRepository = require("./repositories/songsRepository.js");
 songsRepository.init(app, MongoClient);
 require("./routes/songs.js")(app, songsRepository);
 
+const usersRepository = require("./repositories/usersRepository.js");
+usersRepository.init(app, MongoClient);
+require("./routes/users.js")(app, usersRepository);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -40,7 +62,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public'))); //carpeta public estática
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

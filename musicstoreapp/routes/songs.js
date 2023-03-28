@@ -25,6 +25,9 @@ module.exports=function (app, songsRepository) {
         },{
             "title": "Uptown funk",
             "price": "1.1"
+        },{
+            "title": "Don't Wanna Cry",
+            "price": "1.4"
         }];
 
 
@@ -65,7 +68,8 @@ module.exports=function (app, songsRepository) {
         let song = {
             title: req.body.title,
             kind: req.body.kind,
-            price: req.body.price
+            price: req.body.price,
+            author: req.session.user
         };
 
         songsRepository.insertSong(song, function (songId){
@@ -96,6 +100,16 @@ module.exports=function (app, songsRepository) {
                 }
             }
         })
+    });
+
+    app.get('/publications', function (req, res) {
+        let filter = {author : req.session.user};
+        let options = {sort: {title: 1}};
+        songsRepository.getSongs(filter, options).then(songs => {
+            res.render("publications.twig", {songs: songs});
+        }).catch(error => {
+            res.send("Se ha producido un error al listar las publicaciones del usuario:" + error)
+        });
     });
 
     //promocionar responde a esta ruta ya que está definido antes (mayor prioridad)
