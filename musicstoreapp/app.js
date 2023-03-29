@@ -32,7 +32,7 @@ require("./routes/authors.js")(app);
 
 const { MongoClient } = require("mongodb");
 const url =
-    'mongodb+srv://admin:sdiAdminP5wd@tiendamusica.m9ujw.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
+    'mongodb+srv://admin:admin@eii-sdi-cluster.rbxsxlu.mongodb.net/?retryWrites=true&w=majority';
 app.set('connectionStrings', url);
 
 const userSessionRouter = require('./routes/userSessionRouter');
@@ -43,9 +43,13 @@ app.use("/publications",userSessionRouter);
 app.use("/audios/",userAudiosRouter);
 app.use("/shop/",userSessionRouter);
 
+let commentsRepository = require("./repositories/commentsRepository.js");
+commentsRepository.init(app, MongoClient);
+require("./routes/comments.js")(app, commentsRepository);
+
 let songsRepository = require("./repositories/songsRepository.js");
 songsRepository.init(app, MongoClient);
-require("./routes/songs.js")(app, songsRepository);
+require("./routes/songs.js")(app, songsRepository, commentsRepository);
 
 const usersRepository = require("./repositories/usersRepository.js");
 usersRepository.init(app, MongoClient);
