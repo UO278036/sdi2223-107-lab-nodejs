@@ -12,8 +12,14 @@
                 <h2>{{ song.title }}</h2>
                 <p>{{ song.author }}</p>
                 <p>{{ song.kind }}</p>
-                <a class="btn btn-primary pull-right"
-                   href="/songs/buy/{{ song._id }}">{{ song.price }} €</a>
+                {% if canBuy %}
+                    <a class="btn btn-primary pull-right"
+                       href="/songs/buy/{{ song._id }}">{{ song.price }} €</a>
+                {% else %}
+                    <audio controls>
+                        <source src="/audios/{{ song._id }}.mp3" type="audio/mpeg">
+                    </audio>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -21,8 +27,9 @@
 
     <h2>Comentarios</h2>
     {% for comment in comments %}
-        <div class="row">
-            <div class="wrap">{{ comment.author }} : {{comment.text}}</div>
+        <div >
+            <h5>{{ comment.author }}</h5>
+            <h4>{{comment.text}}</h4>
         </div>
     {% endfor %}
 

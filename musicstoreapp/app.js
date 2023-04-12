@@ -32,7 +32,7 @@ require("./routes/authors.js")(app);
 
 const { MongoClient } = require("mongodb");
 const url =
-    'mongodb+srv://admin:sdiAdminP5wd@tiendamusica.m9ujw.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
+    'mongodb+srv://admin:admin@eii-sdi-cluster.rbxsxlu.mongodb.net/?retryWrites=true&w=majority';
 app.set('connectionStrings', url);
 
 const userSessionRouter = require('./routes/userSessionRouter');
