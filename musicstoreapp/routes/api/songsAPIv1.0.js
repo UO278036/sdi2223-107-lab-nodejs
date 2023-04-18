@@ -155,7 +155,7 @@ module.exports = function (app, songsRepository, usersRepository) {
             }).catch(error => {
                 res.status(401);
                 res.json({
-                    message: "Se ha producido un error al verificar las credenciales",
+                    message: "Se ha  producido un error al verificar las credenciales",
                     authenticated: false
                 });
             })
