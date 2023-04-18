@@ -1,0 +1,176 @@
+<div id="widget-detalles">
+  <div class="form-group">
+    <label class="control-label col-sm-2" for="title-detail">Nombre:</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" name="title-detail"
+             placeholder="Título de la canción" id="title-detail" readonly/>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="control-label col-sm-2" for="kind-detail">Género:</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" name="kind-detail"
+             placeholder="Género de la canción" id="kind-detail" readonly/>
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="control-label col-sm-2" for="price-detail">Precio (€):</label>
+    <div class="col-sm-10">
+      <input type="number" step="0.01" class="form-control" name="price-detail"
+             placeholder="2.50" id="price-detail" readonly/>
+    </div>
+  </div>
+  <button onclick="widgetSongs()" class="btn" >Volver</button>
+</div>
+<script>
+  $.ajax({
+    url: URLbase + "/songs/" + selectedSongId,
+    type: "GET",
+    data: {},
+    dataType: 'json',
+    headers: {
+      "token": token
+    },
+    success: function (response) {
+      $("#title-detail").val(response.song.title);
+      $("#kind-detail").val(response.song.kind);
+      $("#price-detail").val(response.song.price);
+    },
+    error: function (error) {
+      $("#main-container").load("widget-login.html");
+    }
+  });
+</script>
+42
+musicstoreapp/public/apiclient/widget-login.html
+@@ -0,0 +1,42 @@
+<div id="widget-login">
+  <div class="form-group">
+    <label class="control-label col-sm-2" for="email">Email:</label>
+    <div class="col-sm-10">
+      <input type="email" class="form-control" name="email"
+             placeholder="email@email.com" id="email" />
+    </div>
+  </div>
+  <div class="form-group">
+    <label class="control-label col-sm-2" for="password">Password:</label>
+    <div class="col-sm-10">
+      <input type="password" class="form-control" name="password"
+             placeholder="contraseña" id="password"/>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="button" id="boton-login">Aceptar</button>
+    </div>
+  </div>
+</div>
+<script>
+  $("#boton-login").click(function () {
+    $.ajax({
+      url: URLbase + "/users/login",
+      type: "POST",
+      data: {
+    <div id="widget-detalles">
+      <div className="form-group">
+        <label className="control-label col-sm-2" htmlFor="title-detail">Nombre:</label>
+        <div className="col-sm-10">
+          <input type="text" className="form-control" name="title-detail"
+                 placeholder="Título de la canción" id="title-detail" readOnly/>
+        </div>
+      </div>
+      <div className="form-group">
+        <label className="control-label col-sm-2" htmlFor="kind-detail">Género:</label>
+        <div className="col-sm-10">
+          <input type="text" className="form-control" name="kind-detail"
+                 placeholder="Género de la canción" id="kind-detail" readOnly/>
+        </div>
+      </div>
+      <div className="form-group">
+        <label className="control-label col-sm-2" htmlFor="price-detail">Precio (€):</label>
+        <div className="col-sm-10">
+          <input type="number" step="0.01" className="form-control" name="price-detail"
+                 placeholder="2.50" id="price-detail" readOnly/>
+        </div>
+      </div>
+      <button onClick="widgetSongs()" className="btn">Volver</button>
+    </div>
+    <script>
+      $.ajax({
+      url: URLbase + "/songs/" + selectedSongId,
+      type: "GET",
+      data: {},
+      dataType: 'json',
+      headers: {
+      "token": token
+    },
+      success: function (response) {
+      $("#title-detail").val(response.song.title);
+      $("#kind-detail").val(response.song.kind);
+      $("#price-detail").val(response.song.price);
+    },
+      error: function (error) {
+      $("#main-container").load("widget-login.html");
+    }
+    });
+</script>
+42
+musicstoreapp/public/apiclient/widget-login.html
+@@ -0,0 +1,42 @@
+<div id="widget-login">
+  <div className="form-group">
+    <label className="control-label col-sm-2" htmlFor="email">Email:</label>
+    <div className="col-sm-10">
+      <input type="email" className="form-control" name="email"
+             placeholder="email@email.com" id="email"/>
+    </div>
+  </div>
+  <div className="form-group">
+    <label className="control-label col-sm-2" htmlFor="password">Password:</label>
+    <div className="col-sm-10">
+      <input type="password" className="form-control" name="password"
+             placeholder="contraseña" id="password"/>
+    </div>
+  </div>
+  <div className="form-group">
+    <div className="col-sm-offset-2 col-sm-10">
+      <button type="button" id="boton-login">Aceptar</button>
+    </div>
+  </div>
+</div>
+<script>
+  $("#boton-login").click(function () {
+    $.ajax({
+      url: URLbase + "/users/login",
+      type: "POST",
+      data: {
+        email: $("#email").val(),
+        password: $("#password").val()
+      },
+      dataType: "json",
+      success: function success(response) {
+        console.log(response.token); //prueba
+        token = response.token;
+        $("#main-container").load("widget-songs.html");
+      },
+      error: function (error) {
+        $("#widget-login").prepend("<div class='alert alert-danger'>Usuario no encontrado</div>");
+      }
+    });
+  });
+</script>
+        email: $("#email").val(),
+        password: $("#password").val()
+      },
+      dataType: "json",
+      success: function success(response) {
+        console.log(response.token); //prueba
+        token = response.token;
+        $("#main-container").load("widget-songs.html");
+      },
+      error: function (error) {
+        $("#widget-login").prepend("<div class='alert alert-danger'>Usuario no encontrado</div>");
+      }
+    });
+  });
+</script>
