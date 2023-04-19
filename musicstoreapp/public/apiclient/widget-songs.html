@@ -1,23 +1,26 @@
-<div id="widget-songs" >
-  <input type="text" class="form-control" placeholder="Filtrar por nombre" id="filter-by-name"/>
-  <button class="btn btn-primary" onclick="widgetAddSong()">Nueva Canción</button>
-  <button class="btn" onclick="loadSongs()" >Actualizar</button>
-  <table class="table table-hover">
+<script src="../../../../sesion10/cookie.js"></script>
+<div id="widget-songs">
+  <input type="text" className="form-control" placeholder="Filtrar por nombre" id="filter-by-name"/>
+  <button className="btn btn-primary" onClick="widgetAddSong()">Nueva Canción</button>
+  <button className="btn" onClick="loadSongs()">Actualizar</button>
+  <table className="table table-hover">
     <thead>
     <tr>
-      <th><a onclick="sortByTitle()">Título</a></th>
+      <th><a onClick="sortByTitle()">Título</a></th>
       <th>Género</th>
-      <th><a onclick="sortByPrice()">Precio</a></th>
-      <th class="col-md-1"></th>
+      <th><a onClick="sortByPrice()">Precio</a></th>
+      <th className="col-md-1"></th>
     </tr>
     </thead>
     <tbody id="songsTableBody"></tbody>
   </table>
 </div>
+
 <script>
   window.history.pushState("", "", "/apiclient/client.html?w=songs");
-  let selectedSongId;
-  let songs;
+  var selectedSongId;
+  var songs;
+
   function loadSongs() {
     $.ajax({
       url: URLbase + "/songs",
@@ -34,9 +37,11 @@
       }
     });
   }
+
   function updateSongsTable(songs) {
-    $("#songsTableBody").empty(); // Vaciar la tabla
-    for (let i = 0; i < songs.length; i++) {
+    $("#songsTableBody").empty();
+    // Vaciar la tabla
+    for (i = 0; i < songs.length; i++) {
       $("#songsTableBody").append(
               "<tr id=" + songs[i]._id + ">" +
               "<td>" + songs[i].title + "</td>" +
@@ -48,9 +53,10 @@
               "</td>" +
               "</tr>");
       // Mucho cuidado con las comillas del eliminarCancion
-      //la id tiene que ir entre comillas ' '
+      // la id tiene que ir entre comillas ' '
     }
   }
+
   function songDelete(_id) {
     $.ajax({
       url: URLbase + "/songs/" + _id,
@@ -60,27 +66,49 @@
       headers: {"token": token},
       success: function (response) {
         console.log("Canción eliminada: " + _id);
-        $("#" + _id).remove(); // eliminar el <tr> de la canción
+        $("#" + _id).remove();
+        // eliminar el <tr> de la canción
       },
       error: function (error) {
-        $("#main-container").load("widget-login.html");
+        // $("#main-container").load("widget-login.html");
+
+        $("#songsTableBody").empty();
+        console.log(error); // <--Prueba
+        $("#div-errors").remove();
+        let errors = (typeof response.responseJSON.errors == 'undefined') ? null : response.responseJSON.errors;
+        if (errors != null && errors.length > 0) {
+          $("#widget-songs").prepend("<div id = 'div-errors' class='alert alert-danger'><ul id = 'ul-errores'></ul></div>");
+          for (i = 0; i < errors.length; i++) {
+            $("#ul-errors").append("<li >" + errors[i] + "</li>");
+          }
+        } else {
+          $("#widget-songs").prepend("<div id = 'div-errors' class='alert alert-danger'>Se ha producido un error inesperado</div>");
+        }
+        loadSongs();
       }
     });
   }
+
   function songDetail(_id) {
     selectedSongId = _id;
     $("#main-container").load("widget-detail.html");
   }
+
   function widgetAddSong() {
-    $( "#main-container" ).load( "widget-add.html");
+    $("#main-container").load("widget-add.html");
   }
-  $('#filter-by-name').on('input',function(e){
+
+  loadSongs();
+
+  $('#filter-by-name').on('input', function (e) {
     let filteredSongs = [];
     let filterValue = $("#filter-by-name").val();
     filteredSongs = songs.filter(song => song.title.includes(filterValue));
     updateSongsTable(filteredSongs);
   });
-  let priceDesc = true;
+
+  var priceDesc = true;
+
   function sortByPrice() {
     if (priceDesc) {
       songs.sort(function (a, b) {
@@ -94,22 +122,16 @@
     updateSongsTable(songs);
     priceDesc = !priceDesc //invertir ordenación
   }
-  let titleDesc = true;
+
   function sortByTitle() {
-    if (titleDesc) {
-      songs.sort(function (a, b) {
-        return (b.title - a.title);
-      });
-    } else {
-      songs.sort(function (a, b) {
-        return (a.title - b.title);
-      });
-    }
+    songs.sort(function (a, b) {
+      if (a.title > b.title)
+        return 1;
+      if (a.title < b.title)
+        return -1;
+      return 0;
+    });
     updateSongsTable(songs);
-    titleDesc = !titleDesc; //invertir
   }
-  loadSongs();
-  setInterval(function (){
-    loadSongs();
-  }, 5000);
+
 </script>
