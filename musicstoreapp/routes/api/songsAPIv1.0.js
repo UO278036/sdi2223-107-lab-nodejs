@@ -1,4 +1,7 @@
 const {ObjectId} = require("mongodb");
+const {validationResult} = require('express-validator')
+const {songValidatorInsert, songValidatorUpdate} = require('./songsValidator')
+
 module.exports = function (app, songsRepository, usersRepository) {
     app.get("/api/v1.0/songs", function (req, res) {
         let filter = {};
@@ -12,7 +15,50 @@ module.exports = function (app, songsRepository, usersRepository) {
         });
     });
 
-    app.post('/api/v1.0/songs', function (req, res) {
+    app.post('/api/v1.0/songs',songValidatorInsert, function (req, res) {
+        try {
+                const errors = validationResult(req);
+                if (!errors.isEmpty()){
+                    res.status(422);
+                    res.json({errors: errors});
+                } else {
+                    let song = {
+                        title: req.body.title,
+                        kind: req.body.kind,
+                        price: req.body.price,
+                        author: req.session.user
+                    }
+                    songsRepository.insertSong(song, function (songId) {
+                        if (songId === null) {
+                            let errors = new Array()
+                            res.status(409);
+                            errors.push("No se ha podido crear la canción. El recurso ya existe.")
+                            res.json({errors: errors});
+                        } else {
+                            res.status(201);
+                            res.json({ message: "Canción añadida correctamente.",
+                                _id: songId
+                            })
+                        }
+                    });
+
+
+                }
+
+
+
+        } catch (e) {
+            res.status(500);
+            res.json({error: "Se ha producido un error al intentar crear la canción: " + e})
+        }
+    }) ;
+
+
+
+    /**
+     *
+
+    app.post('/api/v1.0/songs',songValidatorInsert, function (req, res) {
         try {
             let song = {
                 title: req.body.title,
@@ -49,7 +95,7 @@ module.exports = function (app, songsRepository, usersRepository) {
             res.json({error: "Se ha producido un error al intentar crear la canción: " + e})
         }
     }) ;
-
+     */
     app.get("/api/v1.0/songs/:id", function (req, res) {
         try {
             let songId = ObjectId(req.params.id)
@@ -230,7 +276,7 @@ module.exports = function (app, songsRepository, usersRepository) {
         }
 
         //TITLE :
-        if (song.title === null || typeof song.title === 'undefined' || song.title === '' || song.title.trim() == 0) {
+        if (song.title === null || typeof song.title === 'undefined' ||song.title.trim() == 0) {
             errors.push({
                 "value": "title",
                 "msg": "El title no es valido",

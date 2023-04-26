@@ -6,6 +6,8 @@
     "body-parser": "^1.20.2",
     "express": "^4.17.1",
     "express-session": "^1.17.3",
+    "express-validator": "^7.0.1",
+    "express-validators": "^1.0.4",
     "jsonwebtoken": "^9.0.0",
     "request": "^2.88.2"
   }
